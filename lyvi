@@ -102,8 +102,8 @@ def metadata_get(type, artist, title, lang):
             os.makedirs(cache_dir)
 
         m = get_output('glyrc %s\
-                        -a %s\
-                        -t %s\
+                        -a "%s"\
+                        -t "%s"\
                         -v 0\
                         -w stdout\
                         --callback cat <path>\
