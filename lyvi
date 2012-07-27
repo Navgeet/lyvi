@@ -101,11 +101,14 @@ def metadata_get(type, artist, title, lang):
         if not os.path.exists(cache_dir):
             os.makedirs(cache_dir)
 
-        m = Popen(['glyrc', type, '-a', artist, '-t', title,
-                   '-v', '0', '-w', 'stdout', '--callback', 'cat <path>',
-                   '-l', lang, '-c', cache_dir],
-                  stdout=PIPE, stderr=PIPE)\
-            .communicate()[0].decode().strip()
+        m = get_output('glyrc %s\
+                        -a %s\
+                        -t %s\
+                        -v 0\
+                        -w stdout\
+                        --callback cat <path>\
+                        -l %s\
+                        -c %s' % (type, artist, title, lang, cache_dir))
 
         if m == '':
             m = 'No %s found.' % type
