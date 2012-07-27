@@ -18,10 +18,7 @@ from urllib.request import urlopen
 from threading import Thread, Lock
 from subprocess import Popen, PIPE
 
-import plyr
-
 VERSION = '0.1'
-GLYR_VERSION = plyr.version().split()[1]
 
 locale.setlocale(locale.LC_ALL, '')
 
@@ -104,13 +101,13 @@ def metadata_get(type, artist, title, lang):
         if not os.path.exists(cache_dir):
             os.makedirs(cache_dir)
 
-        db = plyr.Database(cache_dir)
-        query = plyr.Query(artist=artist, title=title,
-                           get_type=type, database=db, language=lang)
-        query.useragent = 'lyvi/0.1'
-        try:
-            m = query.commit()[0].data.decode()
-        except IndexError:
+        m = Popen(['glyrc', type, '-a', artist, '-t', title,
+                   '-v', '0', '-w', 'stdout', '--callback', 'cat <path>',
+                   '-l', lang, '-c', cache_dir],
+                  stdout=PIPE, stderr=PIPE)\
+            .communicate()[0].decode().strip()
+
+        if m == '':
             m = 'No %s found.' % type
 
     return m
@@ -607,7 +604,7 @@ def main(stdscr):
 
 if __name__ == '__main__':
     if '-v' in sys.argv:
-        print('Lyvi %s (libglyr %s)' % (VERSION, GLYR_VERSION))
+        print('Lyvi %s' % VERSION)
         sys.exit()
 
     if os.path.exists(os.environ['HOME'] + '/.cmus/socket'):
